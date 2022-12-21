@@ -1,6 +1,7 @@
 const Card = require('../models/card');
 
 const BAD_REQUEST_ERROR_CODE = 400;
+const NOT_FOUND_ERROR_CODE = 404;
 const INTERNAL_SERVER_ERROR_CODE = 500;
 
 module.exports.getCards = (req, res) => {
@@ -26,7 +27,13 @@ module.exports.createCard = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
-    .then((card) => res.send({ data: card }))
+    .then((card) => {
+      if (!card) {
+        res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Запрашиваемая карточка не найдена' });
+      } else {
+        res.send({ data: card });
+      }
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(BAD_REQUEST_ERROR_CODE).send({ message: 'Запрашиваемая карточка не найдена' });
@@ -38,7 +45,13 @@ module.exports.deleteCard = (req, res) => {
 
 module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
-    .then((card) => res.send({ data: card }))
+    .then((card) => {
+      if (!card) {
+        res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Запрашиваемая карточка не найдена' });
+      } else {
+        res.send({ data: card });
+      }
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(BAD_REQUEST_ERROR_CODE).send({ message: 'Запрашиваемая карточка не найдена' });
@@ -50,7 +63,13 @@ module.exports.likeCard = (req, res) => {
 
 module.exports.dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
-    .then((card) => res.send({ data: card }))
+    .then((card) => {
+      if (!card) {
+        res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Запрашиваемая карточка не найдена' });
+      } else {
+        res.send({ data: card });
+      }
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(BAD_REQUEST_ERROR_CODE).send({ message: 'Запрашиваемая карточка не найдена' });
