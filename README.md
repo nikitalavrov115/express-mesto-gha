@@ -16,5 +16,5 @@ http://localhost:3000
 ## Запуск проекта
 
 `npm run start` — запускает сервер   
-`npm run dev` — запускает сервер с hot-reload
+`npm run dev` — запускает сервер с hot-reload   
 `npm run lint` - проверяет проект с помощью ESLint
