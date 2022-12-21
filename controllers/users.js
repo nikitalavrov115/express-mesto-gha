@@ -16,9 +16,7 @@ module.exports.getUserById = (req, res) => {
       name: user.name, about: user.about, avatar: user.avatar, _id: user._id,
     }))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(BAD_REQUEST_ERROR_CODE).send({ message: 'Запрашиваемый пользователь не найден' });
-      } else if (err.name === 'TypeError') {
+      if (err.name === 'TypeError') {
         res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Запрашиваемый пользователь не найден' });
       } else {
         res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
@@ -43,7 +41,31 @@ module.exports.createUser = (req, res) => {
 module.exports.changeUserInfo = (req, res) => {
   const { name, about } = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
+  if (!name || !about || !(typeof name === 'string') || !(typeof about === 'string')) {
+    res.status(BAD_REQUEST_ERROR_CODE).send({ message: 'Ошибка валидации' });
+  } else {
+    User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
+      .then((user) => {
+        if (!user) {
+          res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Запрашиваемый пользователь не найден' });
+        } else {
+          res.send({ data: user });
+        }
+      })
+      .catch((err) => {
+        if (err.name === 'ValidationError') {
+          res.status(BAD_REQUEST_ERROR_CODE).send({ message: 'Ошибка валидации' });
+        } else {
+          res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
+        }
+      });
+  }
+};
+
+module.exports.changeUserAvatar = (req, res) => {
+  const { avatar } = req.body;
+
+  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
         res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Запрашиваемый пользователь не найден' });
@@ -52,25 +74,7 @@ module.exports.changeUserInfo = (req, res) => {
       }
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Запрашиваемый пользователь не найден' });
-      } else if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST_ERROR_CODE).send({ message: 'Ошибка валидации' });
-      } else {
-        res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
-      }
-    });
-};
-
-module.exports.changeUserAvatar = (req, res) => {
-  const { avatar } = req.body;
-
-  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Запрашиваемый пользователь не найден' });
-      } else if (err.name === 'ValidationError') {
+      if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST_ERROR_CODE).send({ message: 'Ошибка валидации' });
       } else {
         res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });

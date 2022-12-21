@@ -1,6 +1,8 @@
 {
   "name": "backend",
   "version": "1.0.0",
+  "description": "Backend service for Mesto project",
+  "main": "app.js",
   "scripts": {
     "lint": "npx eslint .",
     "start": "node app.js",

@@ -34,13 +34,7 @@ module.exports.deleteCard = (req, res) => {
         res.send({ data: card });
       }
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(BAD_REQUEST_ERROR_CODE).send({ message: 'Запрашиваемая карточка не найдена' });
-      } else {
-        res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
-      }
-    });
+    .catch(() => res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' }));
 };
 
 module.exports.likeCard = (req, res) => {
@@ -52,13 +46,7 @@ module.exports.likeCard = (req, res) => {
         res.send({ data: card });
       }
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(BAD_REQUEST_ERROR_CODE).send({ message: 'Запрашиваемая карточка не найдена' });
-      } else {
-        res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
-      }
-    });
+    .catch(() => res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' }));
 };
 
 module.exports.dislikeCard = (req, res) => {
@@ -70,11 +58,5 @@ module.exports.dislikeCard = (req, res) => {
         res.send({ data: card });
       }
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(BAD_REQUEST_ERROR_CODE).send({ message: 'Запрашиваемая карточка не найдена' });
-      } else {
-        res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
-      }
-    });
+    .catch(() => res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' }));
 };

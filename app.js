@@ -2,6 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
+const userRouter = require('./routes/users');
+const cardRouter = require('./routes/cards');
+
 const app = express();
 
 app.use(bodyParser.json());
@@ -17,8 +20,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/', require('./routes/users'));
-app.use('/', require('./routes/cards'));
+app.use('/', userRouter);
+app.use('/', cardRouter);
 
 app.use((req, res, next) => {
   res.status(404).send({ message: 'Запрашиваемый роут не найден' });
