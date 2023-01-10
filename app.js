@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser');
 const {
   celebrate,
   Joi,
-  isCelebrateError,
+  errors,
 } = require('celebrate');
 require('dotenv').config();
 
@@ -47,18 +47,16 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use((err, req, res, next) => {
-  if (isCelebrateError(err)) {
-    res.status(400).send({ message: 'Ошибка в введенных данных' });
-  } else {
-    const { statusCode = 500, message } = err;
+app.use(errors());
 
-    res.status(statusCode).send({
-      message: statusCode === 500
-        ? 'На сервере произошла ошибка'
-        : message,
-    });
-  }
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+
+  res.status(statusCode).send({
+    message: statusCode === 500
+      ? 'На сервере произошла ошибка'
+      : message,
+  });
   next();
 });
 
