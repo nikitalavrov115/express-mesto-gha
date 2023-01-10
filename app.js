@@ -56,6 +56,7 @@ app.use((err, req, res, next) => {
         : message,
     });
   }
+  next();
 });
 
 app.listen(3000);
