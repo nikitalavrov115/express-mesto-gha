@@ -2,7 +2,7 @@
 # Проект Mesto фронтенд + бэкенд
 
 ```
-http://localhost:3000
+https://github.com/Normal1One/express-mesto-gha
 ```
 
 ## Директории
