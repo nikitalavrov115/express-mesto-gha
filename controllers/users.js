@@ -49,7 +49,9 @@ module.exports.createUser = (req, res, next) => {
     .then((hash) => User.create({
       email, password: hash, name, about, avatar,
     }))
-    .then((users) => res.send({ data: users }))
+    .then((user) => res.send({
+      email: user.email, name: user.name, about: user.about, avatar: user.avatar, _id: user._id,
+    }))
     .catch((e) => {
       if (e.code === 11000) {
         const error = new Error('Данный email уже существует в базе');
@@ -102,7 +104,8 @@ module.exports.login = (req, res, next) => {
       }
 
       const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
-      res.cookie('jwt', token, { maxAge: 604800000, httpOnly: true }).end();
+      res.cookie('jwt', token, { maxAge: 604800000, httpOnly: true });
+      res.status(200).send({ jwt: token });
     })
     .catch(next);
 };
