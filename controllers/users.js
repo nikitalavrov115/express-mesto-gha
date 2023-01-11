@@ -34,7 +34,7 @@ module.exports.getUserMe = (req, res, next) => {
       }
 
       res.send({
-        name: user.name, about: user.about, avatar: user.avatar, _id: user._id,
+        email: user.email, name: user.name, about: user.about, avatar: user.avatar, _id: user._id,
       });
     })
     .catch(next);
