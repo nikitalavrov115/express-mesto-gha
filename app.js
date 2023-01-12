@@ -10,6 +10,7 @@ const {
 } = require('celebrate');
 require('dotenv').config();
 
+const rateLimit = require('express-rate-limit');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
 const {
@@ -19,6 +20,12 @@ const {
 
 const app = express();
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+});
+
+app.use(limiter);
 app.use(helmet());
 app.use(cookieParser());
 app.use(bodyParser.json());

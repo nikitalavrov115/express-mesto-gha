@@ -23,20 +23,21 @@ module.exports.deleteCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundErr('Запрашиваемая карточка не найдена');
       }
-      if (card.owner._id.toHexString() === req.user._id) {
-        Card.findByIdAndRemove(req.params.cardId)
+      if (card.owner._id.toHexString() !== req.user._id) {
+        throw new ForbiddenErr('Запрещено удалять чужие карточки');
+      } else {
+        card.remove();
+        card.save()
           .then(() => {
             res.send({ data: card });
           });
-      } else {
-        throw new ForbiddenErr('Запрещено удалять чужие карточки');
       }
     })
     .catch(next);
 };
 
-module.exports.likeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
+function changeLikeCard(req, res, next, options) {
+  Card.findByIdAndUpdate(req.params.cardId, options, { new: true })
     .then((card) => {
       if (!card) {
         throw new NotFoundErr('Запрашиваемая карточка не найдена');
@@ -45,16 +46,12 @@ module.exports.likeCard = (req, res, next) => {
       }
     })
     .catch(next);
+}
+
+module.exports.likeCard = (req, res, next) => {
+  changeLikeCard(req, res, next, { $addToSet: { likes: req.user._id } });
 };
 
 module.exports.dislikeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
-    .then((card) => {
-      if (!card) {
-        throw new NotFoundErr('Запрашиваемая карточка не найдена');
-      } else {
-        res.send({ data: card });
-      }
-    })
-    .catch(next);
+  changeLikeCard(req, res, next, { $pull: { likes: req.user._id } });
 };

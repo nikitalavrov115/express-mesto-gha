@@ -2,7 +2,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundErr = require('../errors/not-found-err');
-const BadRequestErr = require('../errors/bad-request-err');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -62,28 +61,8 @@ module.exports.createUser = (req, res, next) => {
     .catch(next);
 };
 
-module.exports.changeUserInfo = (req, res, next) => {
-  const { name, about } = req.body;
-
-  if (!name || !about || !(typeof name === 'string') || !(typeof about === 'string')) {
-    throw new BadRequestErr('Ошибка валидации');
-  } else {
-    User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
-      .then((user) => {
-        if (!user) {
-          throw new NotFoundErr('Запрашиваемый пользователь не найден');
-        } else {
-          res.send({ data: user });
-        }
-      })
-      .catch(next);
-  }
-};
-
-module.exports.changeUserAvatar = (req, res, next) => {
-  const { avatar } = req.body;
-
-  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
+function changeUser(req, res, next, data) {
+  User.findByIdAndUpdate(req.user._id, data, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
         throw new NotFoundErr('Запрашиваемый пользователь не найден');
@@ -92,6 +71,18 @@ module.exports.changeUserAvatar = (req, res, next) => {
       }
     })
     .catch(next);
+}
+
+module.exports.changeUserInfo = (req, res, next) => {
+  const { name, about } = req.body;
+
+  changeUser(req, res, next, { name, about });
+};
+
+module.exports.changeUserAvatar = (req, res, next) => {
+  const { avatar } = req.body;
+
+  changeUser(req, res, next, { avatar });
 };
 
 module.exports.login = (req, res, next) => {
