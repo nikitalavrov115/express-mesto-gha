@@ -17,4 +17,4 @@ https://github.com/Normal1One/express-mesto-gha
 
 `npm run start` — запускает сервер   
 `npm run dev` — запускает сервер с hot-reload   
-`npm run lint` - проверяет проект с помощью ESLint
+`npm run lint` — проверяет проект с помощью ESLint

@@ -21,17 +21,14 @@ module.exports.deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
-        throw new NotFoundErr('Запрашиваемая карточка не найдена');
+        return Promise.reject(new NotFoundErr('Запрашиваемая карточка не найдена'));
       }
-      if (card.owner._id.toHexString() !== req.user._id) {
-        throw new ForbiddenErr('Запрещено удалять чужие карточки');
+      if (card.owner._id.toHexString() === req.user._id) {
+        res.send({ data: card });
       } else {
-        card.remove();
-        card.save()
-          .then(() => {
-            res.send({ data: card });
-          });
+        return Promise.reject(new ForbiddenErr('Запрещено удалять чужие карточки'));
       }
+      return null;
     })
     .catch(next);
 };
