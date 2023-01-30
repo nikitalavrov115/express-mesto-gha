@@ -11,6 +11,7 @@ const {
 require('dotenv').config();
 
 const rateLimit = require('express-rate-limit');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
 const {
@@ -25,6 +26,7 @@ const limiter = rateLimit({
   max: 100,
 });
 
+app.use(requestLogger);
 app.use(limiter);
 app.use(helmet());
 app.use(cookieParser());
@@ -35,6 +37,11 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
 app.use('/', userRouter);
 app.use('/', cardRouter);
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -50,6 +57,8 @@ app.post('/signup', celebrate({
     password: Joi.string().required(),
   }),
 }), createUser);
+
+app.use(errorLogger);
 
 app.use((req, res, next) => {
   res.status(404).send({ message: 'Запрашиваемый роут не найден' });
