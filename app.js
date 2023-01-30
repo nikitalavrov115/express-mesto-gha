@@ -27,8 +27,8 @@ const limiter = rateLimit({
 });
 
 const allowedCors = [
-  'http://api.mesto.nikitalavrov.nomoredomainsclub.ru',
-  'https://api.mesto.nikitalavrov.nomoredomainsclub.ru/',
+  'http://mesto.nikitalavrov.nomoredomainsclub.ru',
+  'https://mesto.nikitalavrov.nomoredomainsclub.ru',
   'localhost:3000',
 ];
 
