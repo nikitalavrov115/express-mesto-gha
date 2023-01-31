@@ -5,6 +5,15 @@ const NotFoundErr = require('../errors/not-found-err');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
+function formatUserResponse(user) {
+  return {
+    name: user.name,
+    about: user.about,
+    avatar: user.avatar,
+    _id: user._id,
+  };
+}
+
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
@@ -18,9 +27,7 @@ module.exports.getUserById = (req, res, next) => {
         throw new NotFoundErr('Запрашиваемый пользователь не найден');
       }
 
-      res.send({
-        name: user.name, about: user.about, avatar: user.avatar, _id: user._id,
-      });
+      res.send(formatUserResponse(user));
     })
     .catch(next);
 };
@@ -33,7 +40,11 @@ module.exports.getUserMe = (req, res, next) => {
       }
 
       res.send({
-        email: user.email, name: user.name, about: user.about, avatar: user.avatar, _id: user._id,
+        name: user.name,
+        email: user.email,
+        about: user.about,
+        avatar: user.avatar,
+        _id: user._id,
       });
     })
     .catch(next);
@@ -48,9 +59,7 @@ module.exports.createUser = (req, res, next) => {
     .then((hash) => User.create({
       email, password: hash, name, about, avatar,
     }))
-    .then((user) => res.send({
-      email: user.email, name: user.name, about: user.about, avatar: user.avatar, _id: user._id,
-    }))
+    .then((user) => res.send(formatUserResponse(user)))
     .catch((e) => {
       if (e.code === 11000) {
         const error = new Error('Данный email уже существует в базе');
@@ -67,7 +76,7 @@ function changeUser(req, res, next, data) {
       if (!user) {
         throw new NotFoundErr('Запрашиваемый пользователь не найден');
       } else {
-        res.send({ data: user });
+        res.send(formatUserResponse(user));
       }
     })
     .catch(next);
