@@ -15,6 +15,7 @@ function formatCardResponse(card) {
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
+    .sort({ createdAt: -1 })
     .populate(['owner', 'likes'])
     .then((cards) => res.send({ data: cards }))
     .catch(next);
@@ -41,11 +42,12 @@ module.exports.deleteCard = (req, res, next) => {
         throw new NotFoundErr('Запрашиваемая карточка не найдена');
       }
       if (card.owner._id.toHexString() === req.user._id) {
-        Card.findByIdAndRemove(req.params.cardId)
-          .then(() => res.send(formatCardResponse(card)));
-      } else {
-        throw new ForbiddenErr('Запрещено удалять чужие карточки');
+        return Card.findByIdAndRemove(req.params.cardId)
+          .then(() => {
+            res.send({ data: card });
+          });
       }
+      throw new ForbiddenErr('Запрещено удалять чужие карточки');
     })
     .catch(next);
 };

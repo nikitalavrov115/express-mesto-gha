@@ -4,7 +4,7 @@ const {
   Joi,
 } = require('celebrate');
 const {
-  getUsers, getUserById, changeUserAvatar, changeUserInfo, getUserMe,
+  getUsers, getUserById, changeUser, getUserMe,
 } = require('../controllers/users');
 const auth = require('../middlewares/auth');
 
@@ -14,7 +14,7 @@ router.get('/users/me', auth, getUserMe);
 
 router.get('/users/:userId', auth, celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().alphanum().length(24),
+    userId: Joi.string().hex().length(24),
   }),
 }), getUserById);
 
@@ -23,12 +23,12 @@ router.patch('/users/me', auth, celebrate({
     name: Joi.string().min(2).max(30).required(),
     about: Joi.string().min(2).max(30).required(),
   }),
-}), changeUserInfo);
+}), changeUser);
 
 router.patch('/users/me/avatar', auth, celebrate({
   body: Joi.object().keys({
     avatar: Joi.string().regex(/https?:\/\/((w{3}\.)?[\w\-._~:?#[\]@!$&'\(\)*\+,;=])#?/).required(), /* eslint-disable-line */
   }),
-}), changeUserAvatar);
+}), changeUser);
 
 module.exports = router;

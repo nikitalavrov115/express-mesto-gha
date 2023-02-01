@@ -12,6 +12,8 @@ require('dotenv').config();
 
 const rateLimit = require('express-rate-limit');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const auth = require('./middlewares/auth');
+const NotFoundErr = require('./errors/not-found-err');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
 const {
@@ -71,7 +73,7 @@ app.get('/crash-test', () => {
     throw new Error('Сервер сейчас упадёт');
   }, 0);
 });
-app.get('/logout', (req, res) => {
+app.get('/logout', auth, (req, res) => {
   res.clearCookie('jwt', { httpOnly: true, sameSite: true });
   res.status(200).send(req.cookies);
 });
@@ -93,9 +95,10 @@ app.post('/signup', celebrate({
 
 app.use(errorLogger);
 
-app.use((req, res, next) => {
-  res.status(404).send({ message: 'Запрашиваемый роут не найден' });
-  next();
+app.use((req, res) => {
+  const { statusCode, message } = new NotFoundErr('Запрашиваемый роут не найден');
+
+  res.status(statusCode).send({ message });
 });
 
 app.use(errors());

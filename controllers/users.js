@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundErr = require('../errors/not-found-err');
+const ConflictErr = require('../errors/conflict-err');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -62,16 +63,14 @@ module.exports.createUser = (req, res, next) => {
     .then((user) => res.send(formatUserResponse(user)))
     .catch((e) => {
       if (e.code === 11000) {
-        const error = new Error('Данный email уже существует в базе');
-        error.statusCode = 409;
-        next(error);
+        next(new ConflictErr('Данный email уже существует в базе'));
       }
-    })
-    .catch(next);
+      next(e);
+    });
 };
 
-function changeUser(req, res, next, data) {
-  User.findByIdAndUpdate(req.user._id, data, { new: true, runValidators: true })
+module.exports.changeUser = (req, res, next) => {
+  User.findByIdAndUpdate(req.user._id, req.body, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
         throw new NotFoundErr('Запрашиваемый пользователь не найден');
@@ -80,18 +79,6 @@ function changeUser(req, res, next, data) {
       }
     })
     .catch(next);
-}
-
-module.exports.changeUserInfo = (req, res, next) => {
-  const { name, about } = req.body;
-
-  changeUser(req, res, next, { name, about });
-};
-
-module.exports.changeUserAvatar = (req, res, next) => {
-  const { avatar } = req.body;
-
-  changeUser(req, res, next, { avatar });
 };
 
 module.exports.login = (req, res, next) => {
@@ -99,10 +86,6 @@ module.exports.login = (req, res, next) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      if (!user) {
-        throw new NotFoundErr('Запрашиваемый пользователь не найден');
-      }
-
       const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
       res.cookie('jwt', token, { maxAge: 604800000, httpOnly: true, sameSite: true });
       res.status(200).send({ jwt: token });
