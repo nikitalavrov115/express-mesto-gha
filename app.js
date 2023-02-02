@@ -93,13 +93,11 @@ app.post('/signup', celebrate({
   }),
 }), createUser);
 
-app.use(errorLogger);
-
-app.use((req, res) => {
-  const { statusCode, message } = new NotFoundErr('Запрашиваемый роут не найден');
-
-  res.status(statusCode).send({ message });
+app.use((req, res, next) => {
+  next(new NotFoundErr('Запрашиваемый роут не найден'));
 });
+
+app.use(errorLogger);
 
 app.use(errors());
 
