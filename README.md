@@ -1,20 +1,20 @@
 [![Tests](../../actions/workflows/tests-13-sprint.yml/badge.svg)](../../actions/workflows/tests-13-sprint.yml) [![Tests](../../actions/workflows/tests-14-sprint.yml/badge.svg)](../../actions/workflows/tests-14-sprint.yml)
-# Проект Mesto фронтенд + бэкенд
+# Project Mesto frontend + backend
 
 ```
 https://github.com/Normal1One/express-mesto-gha
 ```
 
-## Директории
+## Directories
 
-`/routes` — папка с файлами роутера  
-`/controllers` — папка с файлами контроллеров пользователя и карточки   
-`/models` — папка с файлами описания схем пользователя и карточки  
-  
-Остальные директории вспомогательные, создаются при необходимости разработчиком
+`/routes` — folder with router files  
+`/controllers` — folder with user and card controllers files   
+`/models` — folder with files describing user schemes and cards  
+`/errors` — folder with files describing custom errors
+`/middlewares` — folder with logging and authentication middleware files
 
-## Запуск проекта
+## Project Launch
 
-`npm run start` — запускает сервер   
-`npm run dev` — запускает сервер с hot-reload   
-`npm run lint` — проверяет проект с помощью ESLint
+`npm run start` — starts the server   
+`npm run dev` — runs the server with hot-reload   
+`npm run lint` — checks the project with ESLint
